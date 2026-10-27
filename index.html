@@ -1,0 +1,1788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VidyaMandir Admin - Student Management System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#090d16'
+                        },
+                        accent: {
+                            500: '#3b82f6',
+                            600: '#2563eb'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Custom scrollbar and polish */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white !important; color: black !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-3 pointer-events-none"></div>
+
+    <!-- Main Layout Container -->
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- Sidebar -->
+        <aside id="sidebar" class="bg-navy-900 text-slate-300 w-64 flex-shrink-0 flex flex-col transition-all duration-300 z-30 shadow-xl">
+            <!-- Brand Logo -->
+            <div class="h-16 flex items-center justify-between px-6 bg-navy-950 border-b border-navy-800">
+                <div class="flex items-center space-x-3 overflow-hidden">
+                    <div class="bg-blue-600 text-white p-2 rounded-lg flex items-center justify-center font-bold text-lg shadow-md">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <span class="font-bold text-white text-lg tracking-wide truncate">VidyaMandir</span>
+                </div>
+                <button id="sidebar-toggle" class="text-slate-400 hover:text-white focus:outline-none lg:hidden">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
+                <a href="#" data-page="dashboard" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors bg-blue-600 text-white shadow-md">
+                    <i class="fa-solid fa-chart-pie w-5 text-center text-lg"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" data-page="students" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white text-slate-300">
+                    <i class="fa-solid fa-user-graduate w-5 text-center text-lg"></i>
+                    <span>Students</span>
+                </a>
+                <a href="#" data-page="teachers" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white text-slate-300">
+                    <i class="fa-solid fa-chalkboard-user w-5 text-center text-lg"></i>
+                    <span>Teachers</span>
+                </a>
+                <a href="#" data-page="attendance" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white text-slate-300">
+                    <i class="fa-solid fa-clipboard-user w-5 text-center text-lg"></i>
+                    <span>Attendance</span>
+                </a>
+                <a href="#" data-page="classes" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white text-slate-300">
+                    <i class="fa-solid fa-school w-5 text-center text-lg"></i>
+                    <span>Classes</span>
+                </a>
+                <a href="#" data-page="fees" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white text-slate-300">
+                    <i class="fa-solid fa-file-invoice-dollar w-5 text-center text-lg"></i>
+                    <span>Fees Management</span>
+                </a>
+                <a href="#" data-page="reports" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white text-slate-300">
+                    <i class="fa-solid fa-chart-column w-5 text-center text-lg"></i>
+                    <span>Reports & Analytics</span>
+                </a>
+                <a href="#" data-page="settings" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white text-slate-300">
+                    <i class="fa-solid fa-gear w-5 text-center text-lg"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+
+            <!-- Sidebar Footer / Disclaimer -->
+            <div class="p-4 border-t border-navy-800 bg-navy-950 text-xs text-slate-400">
+                <p class="font-semibold text-slate-300 mb-1"><i class="fa-solid fa-triangle-exclamation text-amber-400 mr-1"></i> Demo Notice</p>
+                <p class="leading-relaxed">Frontend-only demo application with localStorage persistence. No backend server.</p>
+            </div>
+        </aside>
+
+        <!-- Main Wrapper -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Navbar -->
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 z-20 shadow-sm">
+                <div class="flex items-center space-x-4">
+                    <button id="menu-btn" class="text-slate-600 hover:text-slate-900 focus:outline-none text-xl p-2 rounded-lg hover:bg-slate-100 transition-colors">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <!-- Global Search -->
+                    <div class="relative hidden md:block w-72">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-search"></i>
+                        </span>
+                        <input type="text" id="global-search" placeholder="Search students, teachers, classes..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all">
+                    </div>
+                </div>
+
+                <!-- Right Nav Actions -->
+                <div class="flex items-center space-x-4">
+                    <!-- Notification Bell -->
+                    <div class="relative">
+                        <button id="notification-btn" class="relative p-2.5 text-slate-600 hover:text-blue-600 hover:bg-slate-100 rounded-xl transition-colors focus:outline-none">
+                            <i class="fa-regular fa-bell text-lg"></i>
+                            <span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white"></span>
+                        </button>
+                        <!-- Notification Dropdown -->
+                        <div id="notification-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white border border-slate-200 rounded-2xl shadow-2xl py-3 z-50">
+                            <div class="px-4 pb-2 border-b border-slate-100 flex items-center justify-between">
+                                <span class="font-bold text-slate-800 text-sm">Notifications</span>
+                                <span class="text-xs bg-blue-50 text-blue-600 font-semibold px-2 py-0.5 rounded-full">3 New</span>
+                            </div>
+                            <div class="divide-y divide-slate-100 max-h-72 overflow-y-auto">
+                                <div class="px-4 py-3 hover:bg-slate-50 transition-colors cursor-pointer">
+                                    <p class="text-xs font-semibold text-slate-800">Fee payment received</p>
+                                    <p class="text-xs text-slate-500 mt-0.5">Aarav Sharma paid ₹15,000 for Term 2.</p>
+                                    <span class="text-[10px] text-slate-400 mt-1 block">10 mins ago</span>
+                                </div>
+                                <div class="px-4 py-3 hover:bg-slate-50 transition-colors cursor-pointer">
+                                    <p class="text-xs font-semibold text-slate-800">New student registration</p>
+                                    <p class="text-xs text-slate-500 mt-0.5">Rohan Verma enrolled in Grade 10-A.</p>
+                                    <span class="text-[10px] text-slate-400 mt-1 block">1 hour ago</span>
+                                </div>
+                                <div class="px-4 py-3 hover:bg-slate-50 transition-colors cursor-pointer">
+                                    <p class="text-xs font-semibold text-slate-800">Staff Meeting Notice</p>
+                                    <p class="text-xs text-slate-500 mt-0.5">Scheduled for Friday at 3:30 PM in Conference Room.</p>
+                                    <span class="text-[10px] text-slate-400 mt-1 block">Yesterday</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Admin Profile -->
+                    <div class="flex items-center space-x-3 pl-2 border-l border-slate-200">
+                        <div class="w-10 h-10 rounded-xl bg-blue-600 text-white font-bold flex items-center justify-center shadow-md">
+                            <span>AD</span>
+                        </div>
+                        <div class="hidden sm:block text-left">
+                            <h4 class="text-sm font-bold text-slate-800 leading-tight">Administrator</h4>
+                            <p class="text-xs text-slate-500">Principal Office</p>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Body Area -->
+            <main class="flex-1 overflow-y-auto bg-slate-50 p-6 md:p-8" id="main-content">
+                <!-- Pages get injected here -->
+            </main>
+        </div>
+    </div>
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- Student Add/Edit Modal -->
+    <div id="student-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm hidden">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden max-h-[90vh] flex flex-col animate-in fade-in zoom-in duration-200">
+            <div class="px-6 py-4 bg-navy-900 text-white flex items-center justify-between">
+                <h3 id="student-modal-title" class="font-bold text-lg">Add New Student</h3>
+                <button onclick="closeModal('student-modal')" class="text-slate-300 hover:text-white text-lg focus:outline-none">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="student-form" class="p-6 overflow-y-auto space-y-4 flex-1">
+                <input type="hidden" id="student-edit-id">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Full Name *</label>
+                        <input type="text" id="s-name" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Email Address *</label>
+                        <input type="email" id="s-email" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Gender *</label>
+                        <select id="s-gender" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Date of Birth *</label>
+                        <input type="date" id="s-dob" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Phone Number *</label>
+                        <input type="text" id="s-phone" required placeholder="+91 98765 43210" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Class *</label>
+                        <select id="s-class" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
+                            <option value="">Select Class</option>
+                            <option value="Grade 8">Grade 8</option>
+                            <option value="Grade 9">Grade 9</option>
+                            <option value="Grade 10">Grade 10</option>
+                            <option value="Grade 11">Grade 11</option>
+                            <option value="Grade 12">Grade 12</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Section *</label>
+                        <select id="s-section" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
+                            <option value="">Select Section</option>
+                            <option value="Section A">Section A</option>
+                            <option value="Section B">Section B</option>
+                            <option value="Section C">Section C</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Parent/Guardian Name *</label>
+                        <input type="text" id="s-parent" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Admission Date *</label>
+                        <input type="date" id="s-admission" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Status *</label>
+                        <select id="s-status" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="Graduated">Graduated</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Residential Address *</label>
+                    <textarea id="s-address" rows="2" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"></textarea>
+                </div>
+                <div class="pt-4 border-t border-slate-100 flex items-center justify-end space-x-3">
+                    <button type="button" onclick="closeModal('student-modal')" class="px-5 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">Cancel</button>
+                    <button type="submit" class="px-5 py-2.5 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-md transition-all">Save Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Student View Modal -->
+    <div id="student-view-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm hidden">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden max-h-[90vh] flex flex-col">
+            <div class="px-6 py-4 bg-navy-900 text-white flex items-center justify-between">
+                <h3 class="font-bold text-lg">Student Profile Details</h3>
+                <button onclick="closeModal('student-view-modal')" class="text-slate-300 hover:text-white text-lg focus:outline-none">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div id="student-view-content" class="p-6 overflow-y-auto space-y-6 flex-1">
+                <!-- Dynamically populated -->
+            </div>
+            <div class="px-6 py-3 bg-slate-50 border-t border-slate-100 flex justify-end">
+                <button onclick="closeModal('student-view-modal')" class="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-semibold rounded-xl transition-colors">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Teacher Add/Edit Modal -->
+    <div id="teacher-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm hidden">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden max-h-[90vh] flex flex-col">
+            <div class="px-6 py-4 bg-navy-900 text-white flex items-center justify-between">
+                <h3 id="teacher-modal-title" class="font-bold text-lg">Add New Teacher</h3>
+                <button onclick="closeModal('teacher-modal')" class="text-slate-300 hover:text-white text-lg focus:outline-none">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="teacher-form" class="p-6 overflow-y-auto space-y-4 flex-1">
+                <input type="hidden" id="teacher-edit-id">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Full Name *</label>
+                        <input type="text" id="t-name" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Email Address *</label>
+                        <input type="email" id="t-email" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Phone Number *</label>
+                        <input type="text" id="t-phone" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Subject *</label>
+                        <input type="text" id="t-subject" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Assigned Class *</label>
+                        <select id="t-class" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
+                            <option value="">Select Class</option>
+                            <option value="Grade 8-A">Grade 8-A</option>
+                            <option value="Grade 9-B">Grade 9-B</option>
+                            <option value="Grade 10-A">Grade 10-A</option>
+                            <option value="Grade 11-B">Grade 11-B</option>
+                            <option value="Grade 12-A">Grade 12-A</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Employment Status *</label>
+                        <select id="t-status" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
+                            <option value="Active">Active</option>
+                            <option value="On Leave">On Leave</option>
+                            <option value="Resigned">Resigned</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pt-4 border-t border-slate-100 flex items-center justify-end space-x-3">
+                    <button type="button" onclick="closeModal('teacher-modal')" class="px-5 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">Cancel</button>
+                    <button type="submit" class="px-5 py-2.5 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-md transition-all">Save Teacher</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Class Add/Edit Modal -->
+    <div id="class-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm hidden">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col">
+            <div class="px-6 py-4 bg-navy-900 text-white flex items-center justify-between">
+                <h3 id="class-modal-title" class="font-bold text-lg">Add New Class</h3>
+                <button onclick="closeModal('class-modal')" class="text-slate-300 hover:text-white text-lg focus:outline-none">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="class-form" class="p-6 space-y-4">
+                <input type="hidden" id="class-edit-id">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Class Name / Grade *</label>
+                    <input type="text" id="c-name" required placeholder="e.g. Grade 10" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Section *</label>
+                    <input type="text" id="c-section" required placeholder="e.g. Section A" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Class Teacher *</label>
+                    <input type="text" id="c-teacher" required placeholder="Teacher Name" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Room Number *</label>
+                    <input type="text" id="c-room" required placeholder="e.g. Room 204" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
+                </div>
+                <div class="pt-4 border-t border-slate-100 flex items-center justify-end space-x-3">
+                    <button type="button" onclick="closeModal('class-modal')" class="px-5 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">Cancel</button>
+                    <button type="submit" class="px-5 py-2.5 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-md transition-all">Save Class</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Fee Payment Modal -->
+    <div id="fee-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm hidden">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
+            <div class="px-6 py-4 bg-navy-900 text-white flex items-center justify-between">
+                <h3 class="font-bold text-lg">Record Fee Payment</h3>
+                <button onclick="closeModal('fee-modal')" class="text-slate-300 hover:text-white text-lg focus:outline-none">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="fee-form" class="p-6 space-y-4">
+                <input type="hidden" id="fee-student-id">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Student Name</label>
+                    <input type="text" id="f-student-name" readonly class="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm text-slate-600">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Total Fees (₹)</label>
+                    <input type="text" id="f-total" readonly class="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm text-slate-600">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Current Paid (₹)</label>
+                    <input type="text" id="f-paid-current" readonly class="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-sm text-slate-600">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Amount to Pay Now (₹) *</label>
+                    <input type="number" id="f-amount-paying" required min="1" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
+                </div>
+                <div class="pt-4 border-t border-slate-100 flex items-center justify-end space-x-3">
+                    <button type="button" onclick="closeModal('fee-modal')" class="px-5 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">Cancel</button>
+                    <button type="submit" class="px-5 py-2.5 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-md transition-all">Submit Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm hidden">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 text-center space-y-4">
+            <div class="w-14 h-14 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto text-2xl shadow-inner">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 id="confirm-title" class="font-bold text-lg text-slate-800">Are you sure?</h3>
+            <p id="confirm-message" class="text-sm text-slate-500">This action cannot be undone.</p>
+            <div class="flex items-center justify-center space-x-3 pt-2">
+                <button onclick="closeModal('confirm-modal')" class="px-5 py-2.5 text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors">Cancel</button>
+                <button id="confirm-yes-btn" class="px-5 py-2.5 text-sm font-semibold bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-md transition-all">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== APPLICATION SCRIPT ==================== -->
+    <script>
+        // --- Dummy Data Initialization ---
+        const initialStudents = [
+            { id: "STU001", name: "Aarav Sharma", gender: "Male", dob: "2008-05-14", email: "aarav.sharma@vidyamandir.edu", phone: "+91 98231 45678", class: "Grade 10", section: "Section A", parent: "Rajesh Sharma", address: "42, MG Road, Civil Lines", admission: "2021-04-01", status: "Active" },
+            { id: "STU002", name: "Ananya Patel", gender: "Female", dob: "2009-08-22", email: "ananya.patel@vidyamandir.edu", phone: "+91 97123 89012", class: "Grade 9", section: "Section B", parent: "Suresh Patel", address: "15, Park Street, Sector 4", admission: "2022-04-01", status: "Active" },
+            { id: "STU003", name: "Rahul Kumar", gender: "Male", dob: "2006-12-05", email: "rahul.kumar@vidyamandir.edu", phone: "+91 98987 65432", class: "Grade 12", section: "Section A", parent: "Manoj Kumar", address: "89, Lake View Apartments", admission: "2019-04-01", status: "Active" },
+            { id: "STU004", name: "Diya Nair", gender: "Female", dob: "2010-02-19", email: "diya.nair@vidyamandir.edu", phone: "+91 94432 10987", class: "Grade 8", section: "Section C", parent: "Ramesh Nair", address: "12, Green Enclave", admission: "2023-04-01", status: "Active" },
+            { id: "STU005", name: "Arjun Menon", gender: "Male", dob: "2007-11-30", email: "arjun.menon@vidyamandir.edu", phone: "+91 95567 12345", class: "Grade 11", section: "Section B", parent: "Vinod Menon", address: "78, Palm Grove Road", admission: "2020-04-01", status: "Inactive" },
+            { id: "STU006", name: "Sneha Iyer", gender: "Female", dob: "2008-07-11", email: "sneha.iyer@vidyamandir.edu", phone: "+91 98456 78901", class: "Grade 10", section: "Section A", parent: "Krishnan Iyer", address: "34, Temple View Street", admission: "2021-04-01", status: "Active" },
+            { id: "STU007", name: "Kabir Verma", gender: "Male", dob: "2009-03-25", email: "kabir.verma@vidyamandir.edu", phone: "+91 97234 56789", class: "Grade 9", section: "Section A", parent: "Vikram Verma", address: "56, Sunset Boulevard", admission: "2022-04-01", status: "Active" },
+            { id: "STU008", name: "Pooja Reddy", gender: "Female", dob: "2006-09-17", email: "pooja.reddy@vidyamandir.edu", phone: "+91 96111 22334", class: "Grade 12", section: "Section B", parent: "Srinivas Reddy", address: "90, Jubilee Hills", admission: "2019-04-01", status: "Active" },
+            { id: "STU009", name: "Rohan Das", gender: "Male", dob: "2010-06-08", email: "rohan.das@vidyamandir.edu", phone: "+91 93333 44556", class: "Grade 8", section: "Section A", parent: "Amitabh Das", address: "23, Salt Lake City", admission: "2023-04-01", status: "Active" },
+            { id: "STU010", name: "Meera Joshi", gender: "Female", dob: "2007-04-03", email: "meera.joshi@vidyamandir.edu", phone: "+91 98888 77665", class: "Grade 11", section: "Section A", parent: "Prakash Joshi", address: "67, Model Town", admission: "2020-04-01", status: "Active" },
+            { id: "STU011", name: "Aditya Rao", gender: "Male", dob: "2008-10-12", email: "aditya.rao@vidyamandir.edu", phone: "+91 91122 33445", class: "Grade 10", section: "Section B", parent: "Raghav Rao", address: "11, Banjara Hills", admission: "2021-04-01", status: "Active" },
+            { id: "STU012", name: "Tanvi Kulkarni", gender: "Female", dob: "2009-01-29", email: "tanvi.kulkarni@vidyamandir.edu", phone: "+91 92233 44556", class: "Grade 9", section: "Section C", parent: "Sanjay Kulkarni", address: "44, FC Road, Deccan", admission: "2022-04-01", status: "Active" },
+            { id: "STU013", name: "Karan Malhotra", gender: "Male", dob: "2006-05-21", email: "karan.malhotra@vidyamandir.edu", phone: "+91 94455 66778", class: "Grade 12", section: "Section A", parent: "Alok Malhotra", address: "88, Greater Kailash", admission: "2019-04-01", status: "Graduated" },
+            { id: "STU014", name: "Riya Sen", gender: "Female", dob: "2010-11-15", email: "riya.sen@vidyamandir.edu", phone: "+91 95566 77889", class: "Grade 8", section: "Section B", parent: "Subhash Sen", address: "29, Ballygunge Circular", admission: "2023-04-01", status: "Active" },
+            { id: "STU015", name: "Devansh Pillai", gender: "Male", dob: "2007-08-09", email: "devansh.pillai@vidyamandir.edu", phone: "+91 96677 88990", class: "Grade 11", section: "Section B", parent: "Madhavan Pillai", address: "33, Marine Drive", admission: "2020-04-01", status: "Active" },
+            { id: "STU016", name: "Nisha Gupta", gender: "Female", dob: "2008-12-03", email: "nisha.gupta@vidyamandir.edu", phone: "+91 97788 99001", class: "Grade 10", section: "Section C", parent: "Rakesh Gupta", address: "55, Civil Lines", admission: "2021-04-01", status: "Active" },
+            { id: "STU017", name: "Varun Nair", gender: "Male", dob: "2009-04-18", email: "varun.nair@vidyamandir.edu", phone: "+91 98899 00112", class: "Grade 9", section: "Section A", parent: "Mohan Nair", address: "77, MG Road", admission: "2022-04-01", status: "Active" },
+            { id: "STU018", name: "Kavya Soni", gender: "Female", dob: "2006-10-27", email: "kavya.soni@vidyamandir.edu", phone: "+91 99900 11223", class: "Grade 12", section: "Section B", parent: "Deepak Soni", address: "19, Ring Road", admission: "2019-04-01", status: "Active" },
+            { id: "STU019", name: "Siddharth Roy", gender: "Male", dob: "2010-03-12", email: "siddharth.roy@vidyamandir.edu", phone: "+91 90011 22334", class: "Grade 8", section: "Section C", parent: "Anirban Roy", address: "62, Park Street", admission: "2023-04-01", status: "Active" },
+            { id: "STU020", name: "Zoya Khan", gender: "Female", dob: "2007-06-20", email: "zoya.khan@vidyamandir.edu", phone: "+91 91122 33445", class: "Grade 11", section: "Section A", parent: "Tariq Khan", address: "81, Ashoka Road", admission: "2020-04-01", status: "Active" }
+        ];
+
+        const initialTeachers = [
+            { id: "TCH001", name: "Dr. Anand Kumar", email: "anand.kumar@vidyamandir.edu", phone: "+91 98111 12345", subject: "Mathematics", class: "Grade 10-A", status: "Active" },
+            { id: "TCH002", name: "Mrs. Sunita Deshmukh", email: "sunita.d@vidyamandir.edu", phone: "+91 98222 23456", subject: "Physics", class: "Grade 11-B", status: "Active" },
+            { id: "TCH003", name: "Mr. Rajeshwar Rao", email: "rajeshwar.r@vidyamandir.edu", phone: "+91 98333 34567", subject: "Chemistry", class: "Grade 12-A", status: "Active" },
+            { id: "TCH004", name: "Ms. Preeti Sharma", email: "preeti.s@vidyamandir.edu", phone: "+91 98444 45678", subject: "English Literature", class: "Grade 9-B", status: "Active" },
+            { id: "TCH005", name: "Mr. Manoj Bannerjee", email: "manoj.b@vidyamandir.edu", phone: "+91 98555 56789", subject: "Biology", class: "Grade 10-A", status: "Active" },
+            { id: "TCH006", name: "Mrs. Lakshmi Swaminathan", email: "lakshmi.s@vidyamandir.edu", phone: "+91 98666 67890", subject: "Computer Science", class: "Grade 11-B", status: "Active" },
+            { id: "TCH007", name: "Mr. Harish Chandra", email: "harish.c@vidyamandir.edu", phone: "+91 98777 78901", subject: "History & Civics", class: "Grade 8-A", status: "Active" },
+            { id: "TCH008", name: "Ms. Neha Kapoor", email: "neha.k@vidyamandir.edu", phone: "+91 98888 89012", subject: "Geography", class: "Grade 9-B", status: "Active" },
+            { id: "TCH009", name: "Mr. Vikramaditya Sen", email: "vikram.sen@vidyamandir.edu", phone: "+91 98999 90123", subject: "Economics", class: "Grade 12-A", status: "Active" },
+            { id: "TCH010", name: "Mrs. Anita Verghese", email: "anita.v@vidyamandir.edu", phone: "+91 98000 01234", subject: "Hindi / Sanskrit", class: "Grade 8-A", status: "On Leave" }
+        ];
+
+        const initialClasses = [
+            { id: "CLS001", name: "Grade 8", section: "Section A", teacher: "Mr. Harish Chandra", students: 7, room: "Room 101" },
+            { id: "CLS002", name: "Grade 8", section: "Section B", teacher: "Ms. Neha Kapoor", students: 6, room: "Room 102" },
+            { id: "CLS003", name: "Grade 8", section: "Section C", teacher: "Mrs. Anita Verghese", students: 7, room: "Room 103" },
+            { id: "CLS004", name: "Grade 9", section: "Section A", teacher: "Ms. Preeti Sharma", students: 7, room: "Room 201" },
+            { id: "CLS005", name: "Grade 9", section: "Section B", teacher: "Mr. Rajeshwar Rao", students: 7, room: "Room 202" },
+            { id: "CLS006", name: "Grade 9", section: "Section C", teacher: "Dr. Anand Kumar", students: 6, room: "Room 203" },
+            { id: "CLS007", name: "Grade 10", section: "Section A", teacher: "Dr. Anand Kumar", students: 7, room: "Room 301" },
+            { id: "CLS008", name: "Grade 10", section: "Section B", teacher: "Mrs. Sunita Deshmukh", students: 6, room: "Room 302" },
+            { id: "CLS009", name: "Grade 10", section: "Section C", teacher: "Mr. Manoj Bannerjee", students: 7, room: "Room 303" },
+            { id: "CLS010", name: "Grade 11", section: "Section A", teacher: "Mrs. Lakshmi Swaminathan", students: 7, room: "Room 401" },
+            { id: "CLS011", name: "Grade 12", section: "Section A", teacher: "Mr. Vikramaditya Sen", students: 6, room: "Room 501" }
+        ];
+
+        const initialFees = initialStudents.map((s, idx) => {
+            const total = 45000;
+            const paid = idx % 3 === 0 ? 45000 : (idx % 2 === 0 ? 25000 : 10000);
+            const status = paid === total ? "Paid" : (paid > 0 ? "Partial" : "Pending");
+            return {
+                id: s.id,
+                name: s.name,
+                class: s.class + " - " + s.section,
+                total: total,
+                paid: paid,
+                balance: total - paid,
+                status: status,
+                dueDate: "2026-07-15"
+            };
+        });
+
+        // --- State Management with LocalStorage ---
+        let appState = {
+            students: JSON.parse(localStorage.getItem('vm_students')) || initialStudents,
+            teachers: JSON.parse(localStorage.getItem('vm_teachers')) || initialTeachers,
+            classes: JSON.parse(localStorage.getItem('vm_classes')) || initialClasses,
+            fees: JSON.parse(localStorage.getItem('vm_fees')) || initialFees,
+            attendance: JSON.parse(localStorage.getItem('vm_attendance')) || {},
+            currentPage: 'dashboard'
+        };
+
+        function saveState() {
+            localStorage.setItem('vm_students', JSON.stringify(appState.students));
+            localStorage.setItem('vm_teachers', JSON.stringify(appState.teachers));
+            localStorage.setItem('vm_classes', JSON.stringify(appState.classes));
+            localStorage.setItem('vm_fees', JSON.stringify(appState.fees));
+            localStorage.setItem('vm_attendance', JSON.stringify(appState.attendance));
+        }
+
+        // --- Toast Notification Helper ---
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-emerald-600' : (type === 'error' ? 'bg-rose-600' : 'bg-blue-600');
+            const icon = type === 'success' ? 'fa-circle-check' : (type === 'error' ? 'fa-circle-xmark' : 'fa-circle-info');
+            
+            toast.className = `${bgColor} text-white px-4 py-3 rounded-xl shadow-xl flex items-center space-x-3 text-sm font-semibold pointer-events-auto transform translate-y-2 opacity-0 transition-all duration-300`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-lg"></i><span>${message}</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // --- Modal Control Helpers ---
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        // --- Navigation & Page Rendering ---
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = link.getAttribute('data-page');
+                setActivePage(page);
+            });
+        });
+
+        function setActivePage(page) {
+            appState.currentPage = page;
+            navLinks.forEach(l => {
+                if(l.getAttribute('data-page') === page) {
+                    l.className = "nav-link flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors bg-blue-600 text-white shadow-md";
+                } else {
+                    l.className = "nav-link flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-slate-800 hover:text-white text-slate-300";
+                }
+            });
+            renderPageContent();
+            if(window.innerWidth < 1024) {
+                document.getElementById('sidebar').classList.add('-ml-64');
+            }
+        }
+
+        function renderPageContent() {
+            const container = document.getElementById('main-content');
+            switch(appState.currentPage) {
+                case 'dashboard': container.innerHTML = getDashboardHTML(); initDashboardCharts(); break;
+                case 'students': container.innerHTML = getStudentsHTML(); initStudentsTable(); break;
+                case 'teachers': container.innerHTML = getTeachersHTML(); initTeachersTable(); break;
+                case 'attendance': container.innerHTML = getAttendanceHTML(); initAttendanceModule(); break;
+                case 'classes': container.innerHTML = getClassesHTML(); initClassesTable(); break;
+                case 'fees': container.innerHTML = getFeesHTML(); initFeesTable(); break;
+                case 'reports': container.innerHTML = getReportsHTML(); initReportCharts(); break;
+                case 'settings': container.innerHTML = getSettingsHTML(); break;
+                default: container.innerHTML = getDashboardHTML();
+            }
+        }
+
+        // --- Page HTML Templates & Logic ---
+
+        // 1. Dashboard
+        function getDashboardHTML() {
+            const totalStudents = appState.students.length;
+            const activeStudents = appState.students.filter(s => s.status === 'Active').length;
+            const totalTeachers = appState.teachers.length;
+            const totalClasses = appState.classes.length;
+            const pendingFeesCount = appState.fees.filter(f => f.status !== 'Paid').reduce((acc, f) => acc + f.balance, 0);
+
+            return `
+                <div class="space-y-6 animate-in fade-in duration-300">
+                    <!-- Page Header -->
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Admin Dashboard</h1>
+                            <p class="text-sm text-slate-500 mt-0.5">Welcome back, Principal. Here is your institutional overview.</p>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button onclick="openModal('student-modal'); resetStudentForm();" class="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-md transition-all">
+                                <i class="fa-solid fa-user-plus"></i>
+                                <span>Add Student</span>
+                            </button>
+                            <button onclick="setActivePage('attendance')" class="inline-flex items-center space-x-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-4 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all">
+                                <i class="fa-solid fa-clipboard-user text-blue-600"></i>
+                                <span>Take Attendance</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Summary Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Students</p>
+                                <h3 class="text-3xl font-extrabold text-slate-900 mt-1">${totalStudents}</h3>
+                                <span class="inline-flex items-center text-xs font-semibold text-emerald-600 mt-2 bg-emerald-50 px-2 py-0.5 rounded-full">
+                                    <i class="fa-solid fa-arrow-up mr-1"></i> +4.2% this term
+                                </span>
+                            </div>
+                            <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-2xl shadow-inner">
+                                <i class="fa-solid fa-user-graduate"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Students</p>
+                                <h3 class="text-3xl font-extrabold text-slate-900 mt-1">${activeStudents}</h3>
+                                <span class="inline-flex items-center text-xs font-semibold text-emerald-600 mt-2 bg-emerald-50 px-2 py-0.5 rounded-full">
+                                    <i class="fa-solid fa-check mr-1"></i> ${Math.round((activeStudents/totalStudents)*100)}% attendance readiness
+                                </span>
+                            </div>
+                            <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl shadow-inner">
+                                <i class="fa-solid fa-user-check"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Teachers</p>
+                                <h3 class="text-3xl font-extrabold text-slate-900 mt-1">${totalTeachers}</h3>
+                                <span class="inline-flex items-center text-xs font-semibold text-blue-600 mt-2 bg-blue-50 px-2 py-0.5 rounded-full">
+                                    <i class="fa-solid fa-chalkboard-user mr-1"></i> 100% certified faculty
+                                </span>
+                            </div>
+                            <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl shadow-inner">
+                                <i class="fa-solid fa-chalkboard-user"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Classes</p>
+                                <h3 class="text-3xl font-extrabold text-slate-900 mt-1">${totalClasses}</h3>
+                                <span class="inline-flex items-center text-xs font-semibold text-purple-600 mt-2 bg-purple-50 px-2 py-0.5 rounded-full">
+                                    <i class="fa-solid fa-school mr-1"></i> Grades 8 to 12
+                                </span>
+                            </div>
+                            <div class="w-14 h-14 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center text-2xl shadow-inner">
+                                <i class="fa-solid fa-school"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Attendance Rate</p>
+                                <h3 class="text-3xl font-extrabold text-slate-900 mt-1">94.6%</h3>
+                                <span class="inline-flex items-center text-xs font-semibold text-emerald-600 mt-2 bg-emerald-50 px-2 py-0.5 rounded-full">
+                                    <i class="fa-solid fa-arrow-up mr-1"></i> +1.1% vs last month
+                                </span>
+                            </div>
+                            <div class="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-2xl shadow-inner">
+                                <i class="fa-solid fa-chart-line"></i>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pending Fees</p>
+                                <h3 class="text-3xl font-extrabold text-slate-900 mt-1">₹${pendingFeesCount.toLocaleString('en-IN')}</h3>
+                                <span class="inline-flex items-center text-xs font-semibold text-rose-600 mt-2 bg-rose-50 px-2 py-0.5 rounded-full">
+                                    <i class="fa-solid fa-triangle-exclamation mr-1"></i> Action required
+                                </span>
+                            </div>
+                            <div class="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center text-2xl shadow-inner">
+                                <i class="fa-solid fa-file-invoice-dollar"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Section -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+                            <h3 class="font-bold text-slate-800 text-base mb-4">Student Enrollment (Last 6 Months)</h3>
+                            <div class="h-72"><canvas id="enrollmentChart"></canvas></div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+                            <h3 class="font-bold text-slate-800 text-base mb-4">Weekly Attendance Overview</h3>
+                            <div class="h-72"><canvas id="attendanceChart"></canvas></div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Registrations & Upcoming Events -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm lg:col-span-2">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-bold text-slate-800 text-base">Recent Student Registrations</h3>
+                                <button onclick="setActivePage('students')" class="text-xs font-semibold text-blue-600 hover:text-blue-700">View All</button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="border-b border-slate-100 text-xs font-bold text-slate-400 uppercase">
+                                            <th class="pb-3">Student</th>
+                                            <th class="pb-3">Class</th>
+                                            <th class="pb-3">Admission Date</th>
+                                            <th class="pb-3">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100 text-sm">
+                                        ${appState.students.slice(0, 5).map(s => `
+                                            <tr class="hover:bg-slate-50 transition-colors">
+                                                <td class="py-3 font-semibold text-slate-800 flex items-center space-x-3">
+                                                    <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 font-bold flex items-center justify-center text-xs">${s.name.charAt(0)}</div>
+                                                    <div>
+                                                        <p>${s.name}</p>
+                                                        <p class="text-xs text-slate-400 font-normal">${s.id}</p>
+                                                    </div>
+                                                </td>
+                                                <td class="py-3 text-slate-600">${s.class} - ${s.section}</td>
+                                                <td class="py-3 text-slate-500">${s.admission}</td>
+                                                <td class="py-3"><span class="px-2.5 py-1 text-xs font-semibold rounded-full ${s.status === 'Active' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}">${s.status}</span></td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Announcements & Events -->
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-bold text-slate-800 text-base mb-4">Upcoming Events & Notices</h3>
+                                <div class="space-y-4">
+                                    <div class="p-3.5 bg-blue-50/60 border border-blue-100 rounded-xl">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-md">May 12</span>
+                                            <i class="fa-solid fa-calendar-days text-blue-500"></i>
+                                        </div>
+                                        <h4 class="font-bold text-slate-800 text-sm mt-2">Annual Sports Meet 2026</h4>
+                                        <p class="text-xs text-slate-500 mt-1">Inter-house athletic competitions and track events at main stadium.</p>
+                                    </div>
+                                    <div class="p-3.5 bg-purple-50/60 border border-purple-100 rounded-xl">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs font-bold text-purple-600 bg-purple-100 px-2 py-0.5 rounded-md">May 20</span>
+                                            <i class="fa-solid fa-award text-purple-500"></i>
+                                        </div>
+                                        <h4 class="font-bold text-slate-800 text-sm mt-2">Parent-Teacher Meeting</h4>
+                                        <p class="text-xs text-slate-500 mt-1">First term performance review and progress card distribution.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pt-4 border-t border-slate-100 mt-4">
+                                <button onclick="showToast('Broadcast notice feature is simulated.', 'info')" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-xl transition-colors">Post New Notice</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function initDashboardCharts() {
+            const ctx1 = document.getElementById('enrollmentChart');
+            if(ctx1) {
+                new Chart(ctx1, {
+                    type: 'line',
+                    data: {
+                        labels: ['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'],
+                        datasets: [{
+                            label: 'Students Enrolled',
+                            data: [310, 315, 322, 330, 345, appState.students.length],
+                            borderColor: '#2563eb',
+                            backgroundColor: 'rgba(37, 99, 235, 0.05)',
+                            fill: true,
+                            tension: 0.35,
+                            borderWidth: 3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: false, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+                    }
+                });
+            }
+
+            const ctx2 = document.getElementById('attendanceChart');
+            if(ctx2) {
+                new Chart(ctx2, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+                        datasets: [{
+                            label: 'Attendance %',
+                            data: [95.2, 94.8, 96.1, 93.9, 94.6],
+                            backgroundColor: '#3b82f6',
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { min: 85, max: 100, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } }
+                    }
+                });
+            }
+        }
+
+        // 2. Students Module
+        let studentFilters = { search: '', class: '', gender: '', status: '', page: 1, pageSize: 10 };
+
+        function getStudentsHTML() {
+            return `
+                <div class="space-y-6 animate-in fade-in duration-300">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Student Management</h1>
+                            <p class="text-sm text-slate-500 mt-0.5">Manage student records, enrollment status, and personal details.</p>
+                        </div>
+                        <button onclick="openStudentModal()" class="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-md transition-all">
+                            <i class="fa-solid fa-user-plus"></i>
+                            <span>Add New Student</span>
+                        </button>
+                    </div>
+
+                    <!-- Filters Bar -->
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+                        <div class="w-full md:w-72 relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400"><i class="fa-solid fa-search"></i></span>
+                            <input type="text" id="student-search" placeholder="Search by name, ID, email..." value="${studentFilters.search}" oninput="filterStudents()" class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600">
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                            <select id="filter-class" onchange="filterStudents()" class="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/25">
+                                <option value="">All Classes</option>
+                                <option value="Grade 8">Grade 8</option>
+                                <option value="Grade 9">Grade 9</option>
+                                <option value="Grade 10">Grade 10</option>
+                                <option value="Grade 11">Grade 11</option>
+                                <option value="Grade 12">Grade 12</option>
+                            </select>
+                            <select id="filter-gender" onchange="filterStudents()" class="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/25">
+                                <option value="">All Genders</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                            <select id="filter-status" onchange="filterStudents()" class="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/25">
+                                <option value="">All Statuses</option>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                                <option value="Graduated">Graduated</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Students Table Container -->
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50/80 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                        <th class="py-3.5 px-6">Student ID & Name</th>
+                                        <th class="py-3.5 px-6">Class & Section</th>
+                                        <th class="py-3.5 px-6">Email / Phone</th>
+                                        <th class="py-3.5 px-6">Parent</th>
+                                        <th class="py-3.5 px-6">Status</th>
+                                        <th class="py-3.5 px-6 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="students-table-body" class="divide-y divide-slate-100 text-sm">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Pagination & Count -->
+                        <div id="students-pagination" class="px-6 py-4 bg-slate-50/50 border-t border-slate-200 flex items-center justify-between text-sm text-slate-500">
+                            <!-- Rendered dynamically -->
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function initStudentsTable() {
+            document.getElementById('filter-class').value = studentFilters.class;
+            document.getElementById('filter-gender').value = studentFilters.gender;
+            document.getElementById('filter-status').value = studentFilters.status;
+            renderStudentsTableData();
+        }
+
+        function filterStudents() {
+            studentFilters.search = document.getElementById('student-search').value.toLowerCase();
+            studentFilters.class = document.getElementById('filter-class').value;
+            studentFilters.gender = document.getElementById('filter-gender').value;
+            studentFilters.status = document.getElementById('filter-status').value;
+            studentFilters.page = 1;
+            renderStudentsTableData();
+        }
+
+        function renderStudentsTableData() {
+            const tbody = document.getElementById('students-table-body');
+            const paginationDiv = document.getElementById('students-pagination');
+            if(!tbody) return;
+
+            let filtered = appState.students.filter(s => {
+                const matchSearch = s.name.toLowerCase().includes(studentFilters.search) || s.id.toLowerCase().includes(studentFilters.search) || s.email.toLowerCase().includes(studentFilters.search);
+                const matchClass = studentFilters.class ? s.class === studentFilters.class : true;
+                const matchGender = studentFilters.gender ? s.gender === studentFilters.gender : true;
+                const matchStatus = studentFilters.status ? s.status === studentFilters.status : true;
+                return matchSearch && matchClass && matchGender && matchStatus;
+            });
+
+            if(filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="py-12 text-center text-slate-400">
+                            <i class="fa-solid fa-folder-open text-4xl mb-3"></i>
+                            <p class="font-semibold text-slate-600">No student records found matching your filters.</p>
+                            <p class="text-xs text-slate-400 mt-1">Try clearing or adjusting search terms.</p>
+                        </td>
+                    </tr>
+                `;
+                paginationDiv.innerHTML = `<span>Showing 0 of 0 records</span>`;
+                return;
+            }
+
+            const totalPages = Math.ceil(filtered.length / studentFilters.pageSize);
+            const start = (studentFilters.page - 1) * studentFilters.pageSize;
+            const paginated = filtered.slice(start, start + studentFilters.pageSize);
+
+            tbody.innerHTML = paginated.map(s => `
+                <tr class="hover:bg-slate-50/80 transition-colors">
+                    <td class="py-4 px-6">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 font-bold flex items-center justify-center text-sm shadow-inner">${s.name.charAt(0)}</div>
+                            <div>
+                                <p class="font-semibold text-slate-900">${s.name}</p>
+                                <p class="text-xs text-slate-400 font-mono">${s.id}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-4 px-6 text-slate-700 font-medium">${s.class} <span class="text-slate-400 text-xs">(${s.section})</span></td>
+                    <td class="py-4 px-6">
+                        <p class="text-slate-800 text-xs">${s.email}</p>
+                        <p class="text-slate-400 text-xs mt-0.5">${s.phone}</p>
+                    </td>
+                    <td class="py-4 px-6 text-slate-600 text-xs">${s.parent}</td>
+                    <td class="py-4 px-6">
+                        <span class="px-3 py-1 text-xs font-semibold rounded-full ${s.status === 'Active' ? 'bg-emerald-50 text-emerald-600' : (s.status === 'Inactive' ? 'bg-amber-50 text-amber-600' : 'bg-purple-50 text-purple-600')}">${s.status}</span>
+                    </td>
+                    <td class="py-4 px-6 text-right space-x-2">
+                        <button onclick="viewStudent('${s.id}')" class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View Profile"><i class="fa-solid fa-eye"></i></button>
+                        <button onclick="editStudent('${s.id}')" class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" title="Edit Record"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="confirmDeleteStudent('${s.id}')" class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors" title="Delete Student"><i class="fa-solid fa-trash-can"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+
+            paginationDiv.innerHTML = `
+                <span>Showing ${start + 1} to ${Math.min(start + studentFilters.pageSize, filtered.length)} of ${filtered.length} students</span>
+                <div class="flex items-center space-x-2">
+                    <button onclick="changeStudentPage(${studentFilters.page - 1})" ${studentFilters.page === 1 ? 'disabled class="px-3 py-1.5 bg-slate-100 text-slate-300 rounded-lg cursor-not-allowed text-xs font-semibold"' : 'class="px-3 py-1.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 rounded-lg text-xs font-semibold shadow-sm"'}>Previous</button>
+                    <span class="text-xs font-bold text-slate-700">Page ${studentFilters.page} of ${totalPages || 1}</span>
+                    <button onclick="changeStudentPage(${studentFilters.page + 1})" ${studentFilters.page >= totalPages ? 'disabled class="px-3 py-1.5 bg-slate-100 text-slate-300 rounded-lg cursor-not-allowed text-xs font-semibold"' : 'class="px-3 py-1.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 rounded-lg text-xs font-semibold shadow-sm"'}>Next</button>
+                </div>
+            `;
+        }
+
+        function changeStudentPage(p) {
+            studentFilters.page = p;
+            renderStudentsTableData();
+        }
+
+        function openStudentModal() {
+            document.getElementById('student-modal-title').innerText = 'Add New Student';
+            document.getElementById('student-form').reset();
+            document.getElementById('student-edit-id').value = '';
+            // Auto generate ID
+            const nextNum = appState.students.length + 1;
+            const autoId = 'STU' + String(nextNum).padStart(3, '0');
+            openModal('student-modal');
+        }
+
+        function resetStudentForm() {
+            document.getElementById('student-form').reset();
+            document.getElementById('student-edit-id').value = '';
+        }
+
+        function editStudent(id) {
+            const s = appState.students.find(item => item.id === id);
+            if(!s) return;
+            document.getElementById('student-modal-title').innerText = 'Edit Student — ' + s.id;
+            document.getElementById('student-edit-id').value = s.id;
+            document.getElementById('s-name').value = s.name;
+            document.getElementById('s-email').value = s.email;
+            document.getElementById('s-gender').value = s.gender;
+            document.getElementById('s-dob').value = s.dob;
+            document.getElementById('s-phone').value = s.phone;
+            document.getElementById('s-class').value = s.class;
+            document.getElementById('s-section').value = s.section;
+            document.getElementById('s-parent').value = s.parent;
+            document.getElementById('s-admission').value = s.admission;
+            document.getElementById('s-status').value = s.status;
+            document.getElementById('s-address').value = s.address;
+            openModal('student-modal');
+        }
+
+        function viewStudent(id) {
+            const s = appState.students.find(item => item.id === id);
+            const fee = appState.fees.find(item => item.id === id);
+            if(!s) return;
+            const content = document.getElementById('student-view-content');
+            content.innerHTML = `
+                <div class="flex items-center space-x-4 pb-4 border-b border-slate-100">
+                    <div class="w-16 h-16 rounded-2xl bg-blue-600 text-white font-bold flex items-center justify-center text-2xl shadow-md">${s.name.charAt(0)}</div>
+                    <div>
+                        <h4 class="text-xl font-bold text-slate-900">${s.name}</h4>
+                        <p class="text-sm text-slate-400 font-mono">${s.id} &bull; Adm. Date: ${s.admission}</p>
+                        <span class="inline-block mt-1 px-2.5 py-0.5 text-xs font-semibold rounded-full ${s.status === 'Active' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}">${s.status}</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div class="p-3 bg-slate-50 rounded-xl"><span class="block text-xs font-semibold text-slate-400 uppercase">Gender</span><span class="font-semibold text-slate-800">${s.gender}</span></div>
+                    <div class="p-3 bg-slate-50 rounded-xl"><span class="block text-xs font-semibold text-slate-400 uppercase">Date of Birth</span><span class="font-semibold text-slate-800">${s.dob}</span></div>
+                    <div class="p-3 bg-slate-50 rounded-xl"><span class="block text-xs font-semibold text-slate-400 uppercase">Class & Section</span><span class="font-semibold text-slate-800">${s.class} - ${s.section}</span></div>
+                    <div class="p-3 bg-slate-50 rounded-xl"><span class="block text-xs font-semibold text-slate-400 uppercase">Email</span><span class="font-semibold text-slate-800 text-xs">${s.email}</span></div>
+                    <div class="p-3 bg-slate-50 rounded-xl"><span class="block text-xs font-semibold text-slate-400 uppercase">Phone</span><span class="font-semibold text-slate-800">${s.phone}</span></div>
+                    <div class="p-3 bg-slate-50 rounded-xl"><span class="block text-xs font-semibold text-slate-400 uppercase">Parent / Guardian</span><span class="font-semibold text-slate-800">${s.parent}</span></div>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl text-sm"><span class="block text-xs font-semibold text-slate-400 uppercase">Address</span><span class="font-semibold text-slate-800">${s.address}</span></div>
+                ${fee ? `
+                    <div class="p-4 bg-blue-50/60 border border-blue-100 rounded-xl flex items-center justify-between text-sm">
+                        <div>
+                            <span class="font-bold text-blue-900 block">Fee Account Status: ${fee.status}</span>
+                            <span class="text-xs text-blue-700">Paid: ₹${fee.paid.toLocaleString('en-IN')} / Balance: ₹${fee.balance.toLocaleString('en-IN')}</span>
+                        </div>
+                        <button onclick="closeModal('student-view-modal'); setActivePage('fees');" class="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-semibold shadow">View Fees</button>
+                    </div>
+                ` : ''}
+            `;
+            openModal('student-view-modal');
+        }
+
+        function confirmDeleteStudent(id) {
+            document.getElementById('confirm-title').innerText = 'Delete Student Record?';
+            document.getElementById('confirm-message').innerText = `Are you sure you want to delete student ID ${id}? This action is permanent.`;
+            document.getElementById('confirm-yes-btn').onclick = () => {
+                appState.students = appState.students.filter(s => s.id !== id);
+                appState.fees = appState.fees.filter(f => f.id !== id);
+                saveState();
+                closeModal('confirm-modal');
+                showToast('Student record deleted successfully.', 'success');
+                renderStudentsTableData();
+            };
+            openModal('confirm-modal');
+        }
+
+        // Student Form Submission
+        document.getElementById('student-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const editId = document.getElementById('student-edit-id').value;
+            const studentData = {
+                id: editId || ('STU' + String(appState.students.length + 1).padStart(3, '0')),
+                name: document.getElementById('s-name').value,
+                email: document.getElementById('s-email').value,
+                gender: document.getElementById('s-gender').value,
+                dob: document.getElementById('s-dob').value,
+                phone: document.getElementById('s-phone').value,
+                class: document.getElementById('s-class').value,
+                section: document.getElementById('s-section').value,
+                parent: document.getElementById('s-parent').value,
+                admission: document.getElementById('s-admission').value,
+                status: document.getElementById('s-status').value,
+                address: document.getElementById('s-address').value
+            };
+
+            if(editId) {
+                const index = appState.students.findIndex(s => s.id === editId);
+                if(index !== -1) appState.students[index] = studentData;
+                showToast('Student details updated successfully.', 'success');
+            } else {
+                appState.students.unshift(studentData);
+                // Also initialize fee record for new student
+                appState.fees.push({
+                    id: studentData.id,
+                    name: studentData.name,
+                    class: studentData.class + " - " + studentData.section,
+                    total: 45000,
+                    paid: 0,
+                    balance: 45000,
+                    status: "Pending",
+                    dueDate: "2026-07-15"
+                });
+                showToast('New student added successfully.', 'success');
+            }
+
+            saveState();
+            closeModal('student-modal');
+            renderStudentsTableData();
+        });
+
+
+        // 3. Teachers Module
+        function getTeachersHTML() {
+            return `
+                <div class="space-y-6 animate-in fade-in duration-300">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Teacher Management</h1>
+                            <p class="text-sm text-slate-500 mt-0.5">Faculty directory, subjects, and classroom assignments.</p>
+                        </div>
+                        <button onclick="openTeacherModal()" class="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-md transition-all">
+                            <i class="fa-solid fa-user-plus"></i>
+                            <span>Add New Teacher</span>
+                        </button>
+                    </div>
+
+                    <!-- Teacher Table -->
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50/80 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                        <th class="py-3.5 px-6">Teacher ID & Name</th>
+                                        <th class="py-3.5 px-6">Subject</th>
+                                        <th class="py-3.5 px-6">Assigned Class</th>
+                                        <th class="py-3.5 px-6">Email / Phone</th>
+                                        <th class="py-3.5 px-6">Status</th>
+                                        <th class="py-3.5 px-6 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="teachers-table-body" class="divide-y divide-slate-100 text-sm">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function initTeachersTable() {
+            const tbody = document.getElementById('teachers-table-body');
+            if(!tbody) return;
+            tbody.innerHTML = appState.teachers.map(t => `
+                <tr class="hover:bg-slate-50/80 transition-colors">
+                    <td class="py-4 px-6">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 font-bold flex items-center justify-center text-sm shadow-inner">${t.name.charAt(0)}</div>
+                            <div>
+                                <p class="font-semibold text-slate-900">${t.name}</p>
+                                <p class="text-xs text-slate-400 font-mono">${t.id}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-4 px-6 font-medium text-slate-800">${t.subject}</td>
+                    <td class="py-4 px-6 text-slate-600">${t.class}</td>
+                    <td class="py-4 px-6">
+                        <p class="text-slate-800 text-xs">${t.email}</p>
+                        <p class="text-slate-400 text-xs mt-0.5">${t.phone}</p>
+                    </td>
+                    <td class="py-4 px-6">
+                        <span class="px-3 py-1 text-xs font-semibold rounded-full ${t.status === 'Active' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}">${t.status}</span>
+                    </td>
+                    <td class="py-4 px-6 text-right space-x-2">
+                        <button onclick="editTeacher('${t.id}')" class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" title="Edit Teacher"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="confirmDeleteTeacher('${t.id}')" class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors" title="Delete Teacher"><i class="fa-solid fa-trash-can"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openTeacherModal() {
+            document.getElementById('teacher-modal-title').innerText = 'Add New Teacher';
+            document.getElementById('teacher-form').reset();
+            document.getElementById('teacher-edit-id').value = '';
+            openModal('teacher-modal');
+        }
+
+        function editTeacher(id) {
+            const t = appState.teachers.find(item => item.id === id);
+            if(!t) return;
+            document.getElementById('teacher-modal-title').innerText = 'Edit Teacher — ' + t.id;
+            document.getElementById('teacher-edit-id').value = t.id;
+            document.getElementById('t-name').value = t.name;
+            document.getElementById('t-email').value = t.email;
+            document.getElementById('t-phone').value = t.phone;
+            document.getElementById('t-subject').value = t.subject;
+            document.getElementById('t-class').value = t.class;
+            document.getElementById('t-status').value = t.status;
+            openModal('teacher-modal');
+        }
+
+        function confirmDeleteTeacher(id) {
+            document.getElementById('confirm-title').innerText = 'Delete Teacher?';
+            document.getElementById('confirm-message').innerText = `Are you sure you want to remove teacher ID ${id}?`;
+            document.getElementById('confirm-yes-btn').onclick = () => {
+                appState.teachers = appState.teachers.filter(t => t.id !== id);
+                saveState();
+                closeModal('confirm-modal');
+                showToast('Teacher record removed.', 'success');
+                initTeachersTable();
+            };
+            openModal('confirm-modal');
+        }
+
+        document.getElementById('teacher-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const editId = document.getElementById('teacher-edit-id').value;
+            const teacherData = {
+                id: editId || ('TCH' + String(appState.teachers.length + 1).padStart(3, '0')),
+                name: document.getElementById('t-name').value,
+                email: document.getElementById('t-email').value,
+                phone: document.getElementById('t-phone').value,
+                subject: document.getElementById('t-subject').value,
+                class: document.getElementById('t-class').value,
+                status: document.getElementById('t-status').value
+            };
+
+            if(editId) {
+                const idx = appState.teachers.findIndex(t => t.id === editId);
+                if(idx !== -1) appState.teachers[idx] = teacherData;
+                showToast('Teacher updated successfully.', 'success');
+            } else {
+                appState.teachers.unshift(teacherData);
+                showToast('New teacher added successfully.', 'success');
+            }
+
+            saveState();
+            closeModal('teacher-modal');
+            initTeachersTable();
+        });
+
+
+        // 4. Attendance Module
+        function getAttendanceHTML() {
+            const today = new Date().toISOString().split('T')[0];
+            return `
+                <div class="space-y-6 animate-in fade-in duration-300">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Attendance Management</h1>
+                            <p class="text-sm text-slate-500 mt-0.5">Record daily student attendance by class and section.</p>
+                        </div>
+                        <button onclick="saveAttendanceRecord()" class="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-md transition-all">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            <span>Save Attendance</span>
+                        </button>
+                    </div>
+
+                    <!-- Date & Class Selectors -->
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-wrap gap-4 items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <label class="text-xs font-bold text-slate-700 uppercase">Date:</label>
+                            <input type="date" id="attendance-date" value="${today}" class="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <label class="text-xs font-bold text-slate-700 uppercase">Class Filter:</label>
+                            <select id="attendance-class-filter" onchange="renderAttendanceList()" class="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+                                <option value="Grade 10">Grade 10 - Section A</option>
+                                <option value="Grade 9">Grade 9 - Section B</option>
+                                <option value="Grade 8">Grade 8 - Section C</option>
+                                <option value="Grade 11">Grade 11 - Section A</option>
+                                <option value="Grade 12">Grade 12 - Section A</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Attendance List Table -->
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50/80 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                        <th class="py-3.5 px-6">Student Name & ID</th>
+                                        <th class="py-3.5 px-6">Class</th>
+                                        <th class="py-3.5 px-6 text-center">Mark Attendance Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="attendance-table-body" class="divide-y divide-slate-100 text-sm">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function initAttendanceModule() {
+            renderAttendanceList();
+        }
+
+        function renderAttendanceList() {
+            const tbody = document.getElementById('attendance-table-body');
+            const classFilter = document.getElementById('attendance-class-filter').value;
+            const dateVal = document.getElementById('attendance-date').value;
+            if(!tbody) return;
+
+            const matchingStudents = appState.students.filter(s => s.class === classFilter);
+            const key = dateVal + '_' + classFilter;
+            const savedDayRecord = appState.attendance[key] || {};
+
+            if(matchingStudents.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="py-12 text-center text-slate-400">No students enrolled in ${classFilter}.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = matchingStudents.map(s => {
+                const status = savedDayRecord[s.id] || 'Present';
+                return `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-4 px-6 font-semibold text-slate-800 flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 font-bold flex items-center justify-center text-xs">${s.name.charAt(0)}</div>
+                            <div>
+                                <p>${s.name}</p>
+                                <p class="text-xs text-slate-400 font-mono">${s.id}</p>
+                            </div>
+                        </td>
+                        <td class="py-4 px-6 text-slate-600">${s.class} - ${s.section}</td>
+                        <td class="py-4 px-6 text-center">
+                            <div class="inline-flex rounded-xl p-1 bg-slate-100 space-x-1">
+                                <button type="button" onclick="setAttStatus('${s.id}', 'Present')" class="att-btn-${s.id} px-3 py-1 rounded-lg text-xs font-bold transition-all ${status === 'Present' ? 'bg-emerald-600 text-white shadow' : 'text-slate-600 hover:bg-slate-200'}">Present</button>
+                                <button type="button" onclick="setAttStatus('${s.id}', 'Absent')" class="att-btn-${s.id} px-3 py-1 rounded-lg text-xs font-bold transition-all ${status === 'Absent' ? 'bg-rose-600 text-white shadow' : 'text-slate-600 hover:bg-slate-200'}">Absent</button>
+                                <button type="button" onclick="setAttStatus('${s.id}', 'Late')" class="att-btn-${s.id} px-3 py-1 rounded-lg text-xs font-bold transition-all ${status === 'Late' ? 'bg-amber-500 text-white shadow' : 'text-slate-600 hover:bg-slate-200'}">Late</button>
+                                <button type="button" onclick="setAttStatus('${s.id}', 'Excused')" class="att-btn-${s.id} px-3 py-1 rounded-lg text-xs font-bold transition-all ${status === 'Excused' ? 'bg-purple-600 text-white shadow' : 'text-slate-600 hover:bg-slate-200'}">Excused</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        window.setAttStatus = function(studentId, status) {
+            const classFilter = document.getElementById('attendance-class-filter').value;
+            const dateVal = document.getElementById('attendance-date').value;
+            const key = dateVal + '_' + classFilter;
+            if(!appState.attendance[key]) appState.attendance[key] = {};
+            appState.attendance[key][studentId] = status;
+
+            // Update UI buttons instantly
+            const btns = document.querySelectorAll(`.att-btn-${studentId}`);
+            btns.forEach(btn => {
+                btn.className = `att-btn-${studentId} px-3 py-1 rounded-lg text-xs font-bold transition-all text-slate-600 hover:bg-slate-200`;
+                if(btn.innerText === status) {
+                    if(status === 'Present') btn.className += ' bg-emerald-600 text-white shadow';
+                    else if(status === 'Absent') btn.className += ' bg-rose-600 text-white shadow';
+                    else if(status === 'Late') btn.className += ' bg-amber-500 text-white shadow';
+                    else if(status === 'Excused') btn.className += ' bg-purple-600 text-white shadow';
+                }
+            });
+        }
+
+        function saveAttendanceRecord() {
+            saveState();
+            showToast('Attendance successfully recorded and saved!', 'success');
+        }
+
+
+        // 5. Classes Module
+        function getClassesHTML() {
+            return `
+                <div class="space-y-6 animate-in fade-in duration-300">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Class Management</h1>
+                            <p class="text-sm text-slate-500 mt-0.5">Configure grades, sections, room allocations, and class teachers.</p>
+                        </div>
+                        <button onclick="openClassModal()" class="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-md transition-all">
+                            <i class="fa-solid fa-school-flag"></i>
+                            <span>Add New Class</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="classes-grid">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </div>
+            `;
+        }
+
+        function initClassesTable() {
+            const grid = document.getElementById('classes-grid');
+            if(!grid) return;
+            grid.innerHTML = appState.classes.map(c => `
+                <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-bold bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full">${c.room}</span>
+                            <div class="space-x-1">
+                                <button onclick="editClass('${c.id}')" class="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button onclick="confirmDeleteClass('${c.id}')" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-extrabold text-slate-900">${c.name} &bull; <span class="text-blue-600">${c.section}</span></h3>
+                        <p class="text-xs text-slate-500 mt-1"><i class="fa-solid fa-chalkboard-user mr-1 text-slate-400"></i> Teacher: <span class="font-semibold text-slate-700">${c.teacher}</span></p>
+                    </div>
+                    <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold">
+                        <span class="text-slate-500"><i class="fa-solid fa-user-group mr-1"></i> ${c.students} Enrolled Students</span>
+                        <span class="text-blue-600">Active Section</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openClassModal() {
+            document.getElementById('class-modal-title').innerText = 'Add New Class';
+            document.getElementById('class-form').reset();
+            document.getElementById('class-edit-id').value = '';
+            openModal('class-modal');
+        }
+
+        function editClass(id) {
+            const c = appState.classes.find(item => item.id === id);
+            if(!c) return;
+            document.getElementById('class-modal-title').innerText = 'Edit Class — ' + c.id;
+            document.getElementById('class-edit-id').value = c.id;
+            document.getElementById('c-name').value = c.name;
+            document.getElementById('c-section').value = c.section;
+            document.getElementById('c-teacher').value = c.teacher;
+            document.getElementById('c-room').value = c.room;
+            openModal('class-modal');
+        }
+
+        function confirmDeleteClass(id) {
+            document.getElementById('confirm-title').innerText = 'Delete Class?';
+            document.getElementById('confirm-message').innerText = `Are you sure you want to remove class ID ${id}?`;
+            document.getElementById('confirm-yes-btn').onclick = () => {
+                appState.classes = appState.classes.filter(c => c.id !== id);
+                saveState();
+                closeModal('confirm-modal');
+                showToast('Class removed.', 'success');
+                initClassesTable();
+            };
+            openModal('confirm-modal');
+        }
+
+        document.getElementById('class-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const editId = document.getElementById('class-edit-id').value;
+            const classData = {
+                id: editId || ('CLS' + String(appState.classes.length + 1).padStart(3, '0')),
+                name: document.getElementById('c-name').value,
+                section: document.getElementById('c-section').value,
+                teacher: document.getElementById('c-teacher').value,
+                room: document.getElementById('c-room').value,
+                students: 6
+            };
+
+            if(editId) {
+                const idx = appState.classes.findIndex(c => c.id === editId);
+                if(idx !== -1) appState.classes[idx] = classData;
+                showToast('Class updated successfully.', 'success');
+            } else {
+                appState.classes.push(classData);
+                showToast('New class added successfully.', 'success');
+            }
+
+            saveState();
+            closeModal('class-modal');
+            initClassesTable();
+        });
+
+
+        // 6. Fees Management Module
+        function getFeesHTML() {
+            const totalCollected = appState.fees.reduce((acc, f) => acc + f.paid, 0);
+            const totalPending = appState.fees.reduce((acc, f) => acc + f.balance, 0);
+
+            return `
+                <div class="space-y-6 animate-in fade-in duration-300">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Fees Management</h1>
+                            <p class="text-sm text-slate-500 mt-0.5">Track tuition fee payments, balances, and due dates.</p>
+                        </div>
+                    </div>
+
+                    <!-- Summary Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase">Total Collected</p>
+                                <h3 class="text-2xl font-extrabold text-slate-900 mt-1">₹${totalCollected.toLocaleString('en-IN')}</h3>
+                            </div>
+                            <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-wallet"></i></div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase">Total Pending Balance</p>
+                                <h3 class="text-2xl font-extrabold text-slate-900 mt-1">₹${totalPending.toLocaleString('en-IN')}</h3>
+                            </div>
+                            <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-clock"></i></div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase">Collection Efficiency</p>
+                                <h3 class="text-2xl font-extrabold text-slate-900 mt-1">${Math.round((totalCollected / (totalCollected + totalPending)) * 100)}%</h3>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="fa-solid fa-chart-pie"></i></div>
+                        </div>
+                    </div>
+
+                    <!-- Fees Table -->
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50/80 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                        <th class="py-3.5 px-6">Student ID & Name</th>
+                                        <th class="py-3.5 px-6">Class</th>
+                                        <th class="py-3.5 px-6">Total Fee</th>
+                                        <th class="py-3.5 px-6">Paid Amount</th>
+                                        <th class="py-3.5 px-6">Balance</th>
+                                        <th class="py-3.5 px-6">Status</th>
+                                        <th class="py-3.5 px-6 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="fees-table-body" class="divide-y divide-slate-100 text-sm">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function initFeesTable() {
+            const tbody = document.getElementById('fees-table-body');
+            if(!tbody) return;
+            tbody.innerHTML = appState.fees.map(f => `
+                <tr class="hover:bg-slate-50/80 transition-colors">
+                    <td class="py-4 px-6 font-semibold text-slate-900">
+                        <p>${f.name}</p>
+                        <p class="text-xs text-slate-400 font-mono">${f.id}</p>
+                    </td>
+                    <td class="py-4 px-6 text-slate-600">${f.class}</td>
+                    <td class="py-4 px-6 text-slate-800 font-medium">₹${f.total.toLocaleString('en-IN')}</td>
+                    <td class="py-4 px-6 text-emerald-600 font-semibold">₹${f.paid.toLocaleString('en-IN')}</td>
+                    <td class="py-4 px-6 text-rose-600 font-semibold">₹${f.balance.toLocaleString('en-IN')}</td>
+                    <td class="py-4 px-6">
+                        <span class="px-3 py-1 text-xs font-semibold rounded-full ${f.status === 'Paid' ? 'bg-emerald-50 text-emerald-600' : (f.status === 'Partial' ? 'bg-blue-50 text-blue-600' : 'bg-rose-50 text-rose-600')}">${f.status}</span>
+                    </td>
+                    <td class="py-4 px-6 text-right">
+                        ${f.balance > 0 ? `<button onclick="openFeeModal('${f.id}')" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow transition-all">Record Payment</button>` : `<span class="text-xs font-semibold text-emerald-600"><i class="fa-solid fa-check mr-1"></i> Settled</span>`}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openFeeModal(id) {
+            const f = appState.fees.find(item => item.id === id);
+            if(!f) return;
+            document.getElementById('fee-student-id').value = f.id;
+            document.getElementById('f-student-name').value = f.name + ' (' + f.id + ')';
+            document.getElementById('f-total').value = f.total;
+            document.getElementById('f-paid-current').value = f.paid;
+            document.getElementById('f-amount-paying').value = f.balance;
+            openModal('fee-modal');
+        }
+
+        document.getElementById('fee-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('fee-student-id').value;
+            const paying = Number(document.getElementById('f-amount-paying').value);
+            const f = appState.fees.find(item => item.id === id);
+            if(f) {
+                f.paid += paying;
+                f.balance = Math.max(0, f.total - f.paid);
+                f.status = f.balance === 0 ? 'Paid' : 'Partial';
+                saveState();
+                closeModal('fee-modal');
+                showToast(`Successfully recorded payment of ₹${paying.toLocaleString('en-IN')}`, 'success');
+                initFeesTable();
+            }
+        });
+
+
+        // 7. Reports & Analytics Module
+        function getReportsHTML() {
+            return `
+                <div class="space-y-6 animate-in fade-in duration-300">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Reports & Analytics</h1>
+                            <p class="text-sm text-slate-500 mt-0.5">Comprehensive institutional metrics and export tools.</p>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button onclick="exportStudentsCSV()" class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-md transition-all">
+                                <i class="fa-solid fa-file-csv"></i>
+                                <span>Export Students CSV</span>
+                            </button>
+                            <button onclick="window.print()" class="inline-flex items-center space-x-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-4 py-2.5 rounded-xl text-sm font-semibold shadow-sm transition-all">
+                                <i class="fa-solid fa-print"></i>
+                                <span>Print Report</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+                            <h3 class="font-bold text-slate-800 text-base mb-4">Class-wise Student Distribution</h3>
+                            <div class="h-72"><canvas id="reportClassChart"></canvas></div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+                            <h3 class="font-bold text-slate-800 text-base mb-4">Fee Collection Status Ratio</h3>
+                            <div class="h-72"><canvas id="reportFeeChart"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function initReportCharts() {
+            const ctx1 = document.getElementById('reportClassChart');
+            if(ctx1) {
+                const classCounts = {};
+                appState.students.forEach(s => {
+                    classCounts[s.class] = (classCounts[s.class] || 0) + 1;
+                });
+                new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(classCounts),
+                        datasets: [{
+                            label: 'Students',
+                            data: Object.values(classCounts),
+                            backgroundColor: '#2563eb',
+                            borderRadius: 8
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                });
+            }
+
+            const ctx2 = document.getElementById('reportFeeChart');
+            if(ctx2) {
+                const paidCount = appState.fees.filter(f => f.status === 'Paid').length;
+                const partialCount = appState.fees.filter(f => f.status === 'Partial').length;
+                const pendingCount = appState.fees.filter(f => f.status === 'Pending').length;
+                new Chart(ctx2, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Paid', 'Partial', 'Pending'],
+                        datasets: [{
+                            data: [paidCount, partialCount, pendingCount],
+                            backgroundColor: ['#10b981', '#3b82f6', '#f43f5e']
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+        }
+
+        function exportStudentsCSV() {
+            let csv = 'Student ID,Full Name,Gender,Date of Birth,Email,Phone,Class,Section,Parent,Admission Date,Status\n';
+            appState.students.forEach(s => {
+                csv += `"${s.id}","${s.name}","${s.gender}","${s.dob}","${s.email}","${s.phone}","${s.class}","${s.section}","${s.parent}","${s.admission}","${s.status}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'vidyamandir_students_export.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showToast('Student CSV export downloaded successfully.', 'success');
+        }
+
+
+        // 8. Settings Module
+        function getSettingsHTML() {
+            return `
+                <div class="space-y-6 max-w-2xl animate-in fade-in duration-300">
+                    <div>
+                        <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">System Settings</h1>
+                        <p class="text-sm text-slate-500 mt-0.5">Manage data storage and application preferences.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-6">
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-base">Local Data Management</h3>
+                            <p class="text-xs text-slate-500 mt-1">This application stores all records securely in your browser's <code class="bg-slate-100 px-1.5 py-0.5 rounded text-slate-700 font-mono">localStorage</code>. You can reset all records back to the original demo dataset at any time.</p>
+                        </div>
+                        <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+                            <div>
+                                <h4 class="font-semibold text-slate-800 text-sm">Reset to Demo Data</h4>
+                                <p class="text-xs text-slate-500">Erases all current changes and restores original dummy records.</p>
+                            </div>
+                            <button onclick="confirmResetData()" class="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-sm font-semibold shadow transition-all">Reset Application</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50/60 border border-blue-100 p-6 rounded-2xl text-sm text-blue-900 space-y-2">
+                        <h4 class="font-bold flex items-center space-x-2"><i class="fa-solid fa-circle-info"></i><span>About VidyaMandir SMS</span></h4>
+                        <p class="text-xs leading-relaxed text-blue-800">Designed as a professional frontend-only administration dashboard. Built with Tailwind CSS, Chart.js, and vanilla JavaScript. Fully responsive across desktop, tablet, and mobile browsers.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function confirmResetData() {
+            document.getElementById('confirm-title').innerText = 'Reset All Data?';
+            document.getElementById('confirm-message').innerText = 'This will erase all added students, teachers, and attendance logs, restoring the original demonstration dataset.';
+            document.getElementById('confirm-yes-btn').onclick = () => {
+                localStorage.clear();
+                appState.students = initialStudents;
+                appState.teachers = initialTeachers;
+                appState.classes = initialClasses;
+                appState.fees = initialFees;
+                appState.attendance = {};
+                saveState();
+                closeModal('confirm-modal');
+                showToast('Application reset to original demo state.', 'success');
+                setActivePage('dashboard');
+            };
+            openModal('confirm-modal');
+        }
+
+
+        // --- Global Event Listeners & Initialization ---
+        document.getElementById('menu-btn').addEventListener('click', () => {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('-ml-64');
+        });
+
+        document.getElementById('sidebar-toggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.add('-ml-64');
+        });
+
+        document.getElementById('notification-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            const dropdown = document.getElementById('notification-dropdown');
+            dropdown.classList.toggle('hidden');
+        });
+
+        window.addEventListener('click', () => {
+            const dropdown = document.getElementById('notification-dropdown');
+            if(dropdown && !dropdown.classList.contains('hidden')) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+        // Global search shortcut
+        document.getElementById('global-search').addEventListener('input', (e) => {
+            const val = e.target.value.trim();
+            if(val.length > 2) {
+                appState.currentPage = 'students';
+                studentFilters.search = val.toLowerCase();
+                setActivePage('students');
+            }
+        });
+
+        // Initialize application on load
+        window.addEventListener('DOMContentLoaded', () => {
+            setActivePage('dashboard');
+        });
+    </script>
+</body>
+</html>
